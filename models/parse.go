@@ -1,12 +1,11 @@
-package grpc
+package models
 
 import (
-	"TmageUsersServer/models"
 	"github.com/listenGrey/TmagegRpcPKG/userInfo"
 )
 
-func RegisterFormMarshal(r *userInfo.RegisterForm) models.Register {
-	var user models.Register
+func RegisterFormMarshal(r *userInfo.RegisterForm) Register {
+	var user Register
 
 	user.Email = r.GetEmail()
 	user.UserID = r.GetUserID()
@@ -16,8 +15,8 @@ func RegisterFormMarshal(r *userInfo.RegisterForm) models.Register {
 	return user
 }
 
-func LoginMarshal(form *userInfo.LoginForm) models.Login {
-	var login models.Login
+func LoginMarshal(form *userInfo.LoginForm) Login {
+	var login Login
 
 	login.Email = form.GetEmail()
 	login.Password = form.GetPassword()

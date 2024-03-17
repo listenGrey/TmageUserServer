@@ -18,7 +18,7 @@ func main() {
 	//初始化 gRpc server
 	server := grpc.NewServer()
 
-	userInfo.RegisterCheckExistenceServer(server, &local.RegisterExistenceServer{})
+	userInfo.RegisterCheckExistenceServer(server, &local.ExistenceServer{})
 	userInfo.RegisterRegisterInfoServer(server, &local.RegisterServer{})
 	userInfo.RegisterLoginCheckServer(server, &local.LoginServer{})
 

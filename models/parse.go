@@ -14,12 +14,3 @@ func RegisterFormMarshal(r *userInfo.RegisterForm) Register {
 
 	return user
 }
-
-func LoginMarshal(form *userInfo.LoginForm) Login {
-	var login Login
-
-	login.Email = form.GetEmail()
-	login.Password = form.GetPassword()
-
-	return login
-}

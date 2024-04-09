@@ -16,15 +16,15 @@ const (
 	StatusUserNotExist Code = 1003
 	StatusInvalidPwd   Code = 1004
 	StatusBusy         Code = 1005
-	StatusConnDBErr    Code = 1202
+	StatusConnDBERR    Code = 1104
 )
 
-func CheckEmail(email string) bool {
+func CheckEmail(email string) (bool, int64) {
 	// 连接DB
 	client := MongoDBClient("tmageUser", "user")
 	if client == nil {
 		log.Printf("无法连接到MongoDB")
-		return false
+		return false, int64(StatusConnDBERR)
 	}
 
 	// 创建一个过滤器
@@ -34,42 +34,42 @@ func CheckEmail(email string) bool {
 	cursor, err := client.CountDocuments(context.Background(), filter)
 	if err != nil {
 		err.Error()
-		return false
+		return false, int64(StatusBusy)
 	}
 
 	// 返回结果
 	if cursor == 0 {
-		return false
+		return false, int64(StatusSuccess)
 	} else {
-		return true
+		return true, int64(StatusSuccess)
 	}
 
 }
 
-func InsertUser(user *userInfo.RegisterForm) bool {
+func InsertUser(user *userInfo.RegisterForm) (bool, int64) {
 	// 连接DB
 	client := MongoDBClient("tmageUser", "user")
 	if client == nil {
 		log.Printf("无法连接到MongoDB")
-		return false
+		return false, int64(StatusConnDBERR)
 	}
 	// 插入数据
 	userData, err := bson.Marshal(models.RegisterFormMarshal(user))
 	_, err = client.InsertOne(context.TODO(), userData)
 	if err != nil {
 		err.Error()
-		return false
+		return false, int64(StatusBusy)
 	}
-	return true
+	return true, int64(StatusSuccess)
 }
 
-func Login(user *userInfo.LoginForm) (info, userID int64) {
+func Login(user *userInfo.LoginForm) (userID, info int64) {
 	// 连接DB
 	client := MongoDBClient("tmageUser", "user")
 	if client == nil {
 		log.Printf("无法连接到MongoDB")
-		info = int64(StatusConnDBErr)
 		userID = 0
+		info = int64(StatusConnDBERR)
 		return
 	}
 
@@ -79,25 +79,25 @@ func Login(user *userInfo.LoginForm) (info, userID int64) {
 	var loginUser models.Register
 	err := client.FindOne(context.Background(), filter).Decode(&loginUser)
 	if err == mongo.ErrNoDocuments {
-		info = int64(StatusUserNotExist)
 		userID = 0
+		info = int64(StatusUserNotExist)
 		return
 	} else if err != nil {
 		err.Error()
-		info = int64(StatusBusy)
 		userID = 0
+		info = int64(StatusBusy)
 		return
 	}
 
 	// 检查密码是否匹配
 	if loginUser.Password != user.GetPassword() {
-		info = int64(StatusInvalidPwd)
 		userID = 0
+		info = int64(StatusInvalidPwd)
 		return
 	}
 
-	info = int64(StatusSuccess)
 	userID = loginUser.UserID
+	info = int64(StatusSuccess)
 	return
 
 }

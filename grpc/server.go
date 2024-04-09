@@ -20,7 +20,8 @@ func (u *ExistenceServer) RegisterCheck(ctx context.Context, email *userInfo.Reg
 	}
 
 	// 检查邮箱
-	return &userInfo.Existence{Exsit: dao.CheckEmail(email.GetEmail())}, nil
+	exist, info := dao.CheckEmail(email.GetEmail())
+	return &userInfo.Existence{Exist: exist, Info: info}, nil
 
 }
 
@@ -33,8 +34,8 @@ func (r *RegisterServer) Register(ctx context.Context, form *userInfo.RegisterFo
 	if ok {
 		log.Printf("用户注册")
 	}
-
-	return &userInfo.Success{Success: dao.InsertUser(form)}, nil
+	flag, info := dao.InsertUser(form)
+	return &userInfo.Success{Success: flag, Info: info}, nil
 }
 
 type LoginServer struct {
@@ -46,6 +47,6 @@ func (u *LoginServer) LoginCheck(ctx context.Context, user *userInfo.LoginForm) 
 	if ok {
 		log.Printf("用户登录")
 	}
-	info, userID := dao.Login(user)
-	return &userInfo.LogInfo{Info: info, UserID: userID}, nil
+	userID, info := dao.Login(user)
+	return &userInfo.LogInfo{UserID: userID, Info: info}, nil
 }
